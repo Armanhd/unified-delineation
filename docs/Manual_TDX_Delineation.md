@@ -183,25 +183,48 @@ rm -rf -- outputs batch_tdx indexes/tdx_regional_topology \
 
 Rebuild Step01 region index as well if repaired sources change its content. Remove/rebuild `indexes/tdx_regions.csv` only if you know how to regenerate it. The `rm` block is a **proposed** user-executed action; no remote deletion has been performed.
 
-## 9. ArcGIS review layers: include successful and failed basins
+## 9. Generate ArcGIS review layers
 
-The separate `10_build_arcgis_review_layers.py` deliberately does not fabricate a watershed where no geometry exists. It selects the best available polygon: `tdx_nested_preview`, then `tdx_clipped`, then `tdx_native`, else a partially generated Step05/Step04 polygon. It always includes station points from the supplied gauge catalogue, even if no watershed polygon was produced.
+After collecting the batch results (Step 7.2), generate GIS layers for reviewing successful, failed, and pending watershed delineations.
+
+The workflow retains the best available watershed polygon for each basin (`tdx_nested_preview` → `tdx_clipped` → `tdx_native` → partial Step05/Step04). Stations without valid watershed geometry are still included as gauge points.
+
+### Run on Slurm
+
+From the project root, using the batch label defined in Step 7.2:
 
 ```bash
-python 1_delineation/common/10_build_arcgis_review_layers.py \
-  --root . --label camels_tdx_clean_20261025 \
-  --catalog indexes/gauge_catalogs/camels-spat_gauge_catalog_validated.csv
+mkdir -p slurm_logs
+
+sbatch 1_delineation/tdx/run_10_arcgis_review.sbatch "$LABEL"
 ```
 
-Produced under `batch_tdx/LABEL/arcgis_review/`:
+The Slurm script executes `1_delineation/tdx/10_build_arcgis_review_layers.py`.
 
-- `basin_boundaries_for_review.shp` — one available polygon per site, including **partial** polygons for failed exports when possible.
-- `all_station_points.shp` — all stations with valid WGS84 coordinates, including **FAILED** and **PENDING** sites.
-- `all_basins_review_status.csv` — every batch/manifest site, including those with **no polygon**.
-- `basin_review.gpkg` and `station_review.gpkg` — easier for ArcGIS Pro when attribute lengths or field names exceed shapefile limitations.
-- `review_layers_summary.json` — count of points/polygons and source types.
+### Outputs
 
-Attributes: `site_id`, `region_id`, `wf_status`, `snap_stat`, `geom_src`, `variant`, `station_y`, `station_x`, `has_poly`, `problem`. `geom_src=PARTIAL_STEP05` or `PARTIAL_STEP04` identifies **not fully validated** geometry. Compare points and watershed boundaries manually in ArcGIS; inspect basin areas, outlet placement, network gaps, DEM voids and nesting. **This is a review dataset, not a final CWARHM export.**
+All files are saved under `batch_tdx/<LABEL>/arcgis_review/`.
+
+| File | Description |
+|---|---|
+| `basin_boundaries_for_review.shp` | Best available watershed polygon per station, including partial delineations |
+| `all_station_points.shp` | Original gauge locations, including failed and pending stations |
+| `all_basins_review_status.csv` | Processing status of all stations, including those without polygons |
+| `basin_review.gpkg` | Watershed polygons in GeoPackage format |
+| `station_review.gpkg` | Gauge locations and associated attributes |
+| `review_layers_summary.json` | Summary of generated geometries and processing statuses |
+
+Key attributes include `site_id`, `region_id`, `wf_status`, `snap_stat`, `geom_src`, `variant`, `has_poly`, and `problem`.
+
+Check the results:
+
+```bash
+ls -lh batch_tdx/"$LABEL"/arcgis_review/
+```
+
+Open the GIS files in ArcGIS Pro or QGIS to inspect watershed boundaries, outlet positions, river networks, nesting, and failed delineations.
+
+**Note:** These layers are intended for visual review, not production-approved CWARHM exports. The current Slurm wrapper requires its catalogue and environment paths to be configured for the target dataset and computing system.
 
 ## 10. Other datasets (colleague checklist)
 
