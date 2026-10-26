@@ -1,0 +1,57 @@
+# ============================================================
+# Unified Delineation - Git ignore rules
+# ============================================================
+
+# Generated watershed and batch results
+outputs/
+batch_tdx/
+indexes/
+slurm_logs/
+logs/
+
+# Station-specific generated control files
+0_control_files/tdx_camels_spat/
+0_control_files/tdx_*/
+
+# Dataset-specific station catalogues
+inputs/gauge_metadata/*.csv
+
+# Generated diagnostics and temporary files
+diagnostic_*.csv
+check_camels_spat_*.csv
+*.bak
+*.tmp
+*.log
+*.out
+*.err
+*.pyc
+__pycache__/
+.DS_Store
+
+# Spatial data and large numerical datasets
+*.gpkg
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.tif
+*.tiff
+*.nc
+*.nc4
+*.h5
+*.parquet
+
+# Python environments
+.venv/
+venv/
+.env
+
+# Accidental command-argument files
+/--*
+
+# CAMELS-SPAT-specific diagnostic scripts
+/check_camels_spat_fractional_ids.py
+
+# Dataset-specific pilot submission
+/run_05b_nested_pilot_array.sbatch

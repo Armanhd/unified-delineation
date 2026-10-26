@@ -1,0 +1,22 @@
+name: unified_delineation
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.11
+  - geopandas
+  - rasterio
+  - shapely
+  - pyproj
+  - fiona
+  - numpy
+  - pandas
+  - scipy
+  - networkx
+  - pyogrio
+  - gdal
+  - pip
+  - pip:
+      - pysheds
+      - delineator

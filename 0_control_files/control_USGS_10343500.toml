@@ -1,0 +1,204 @@
+# ============================================================
+# UNIFIED WATERSHED DELINEATION - BASIN CONTROL FILE
+# ============================================================
+
+[domain]
+site_id = "USGS_10343500"
+site_name = "Sagehen_Creek_near_Truckee"
+
+# Coordinates of the watershed outlet (typically the streamflow gauge).
+# Use decimal degrees in WGS84 (EPSG:4326):
+# lat = latitude  (-90 to 90; north positive)
+# lon = longitude (-180 to 180; east positive)
+# The outlet will be snapped to the nearest suitable river reach.
+lat = 39.431546
+lon = -120.237955
+
+# Optional observed drainage area (km2)
+observed_area_km2 = 27.2
+
+# Available methods: TDX, MERIT, fromDEM
+delineation_method = "TDX"
+
+
+# ============================================================
+# INPUT DATA
+# ============================================================
+
+[input]
+tdx_directory = "/work/comphyd_lab/data/geospatial-data/TDX_hydrofabrics/TDX_hydrofabrics"
+
+# Optional: used when method = MERIT
+merit_directory = "/work/comphyd_lab/data/geospatial-data/MERIT-Basins/MERIT_Hydro_v07_Basins_v01_bugfix1"
+
+# Optional: used when method = fromDEM
+dem_directory = ""
+
+# TDX hydrofabric tile
+# Initially specified; automatic discovery can be added later
+tdx_id = "7020000010"
+
+tdx_basins_file = "7020000010-basins.gpkg"
+tdx_streams_file = "7020000010-streamnet.gpkg"
+
+# Leave empty to automatically use the first layer
+tdx_basins_layer = ""
+tdx_streams_layer = ""
+
+
+# ============================================================
+# OUTLET IDENTIFICATION
+# ============================================================
+
+[outlet]
+# automatic or manual
+selection_method = "automatic"
+
+# Used only when selection_method = "manual"
+manual_reach_id = 0
+
+# Maximum search distance from gauge to candidate river reaches
+search_radius_m = 500.0
+
+# Number of nearest candidates to evaluate
+max_candidates = 10
+
+# Prefer proximity, while checking river size and drainage area
+use_drainage_area = true
+use_stream_order = true
+
+# Maximum acceptable difference between modelled and observed
+# drainage area, expressed as a percentage.
+# Used as a diagnostic, not an automatic rejection threshold.
+area_difference_warning_pct = 20.0
+
+# Save all outlet candidates for review
+save_candidates = true
+
+# Units of the TDX USContArea and DSContArea attributes.
+# Verify against the source TDX dataset before using area comparisons.
+upstream_area_units = "m2"
+
+
+# ============================================================
+# DELINEATION
+# ============================================================
+
+[delineation]
+
+hru_method = "native_subbasins"
+clip_outlet_reach = true
+
+# Options:
+# full           = keep native TDX subbasins
+# dem_refined    = generate new Copernicus D8 watershed
+# hydrosheds_v2  = HydroSHEDS method (requires D8 for exact raster delineation)
+# reference_clip = use an existing watershed boundary
+outlet_subbasin_method = "dem_refined"
+
+projected_crs = "EPSG:26910"
+output_crs = "EPSG:4326"
+
+# ------------------------------------------------------------
+# COPERNICUS GLO-30
+# ------------------------------------------------------------
+
+dem_directory = "/work/comphyd_lab/data/geospatial-data/copernicus/glo-30"
+dem_buffer_m = 3000
+dem_snap_radius_m = 300
+dem_min_accumulation_cells = 10000
+dem_max_cells = 30000000
+
+# ------------------------------------------------------------
+# HYDROSHEDS V2
+# ------------------------------------------------------------
+
+hydrosheds_directory = "/work/comphyd_lab/data/geospatial-data/HydroSHEDSv2"
+
+hydrosheds_region = "north-america"
+hydrosheds_resolution = "1s"
+hydrosheds_version = "v2r0"
+
+hydrosheds_accumulation_file = "north-america_ACC_1s_v2r0.tif"
+hydrosheds_river_file = "north-america_RIV_1s_v2r0.gpkg"
+hydrosheds_basin_file = "north-america_BAS_1s_v2r0.gpkg"
+
+hydrosheds_snap_radius_m = 300
+
+# ------------------------------------------------------------
+# REFERENCE WATERSHED
+# ------------------------------------------------------------
+
+reference_catchment_file = ""
+
+# ============================================================
+# HYDROFABRIC FIELD MAPPING
+# ============================================================
+
+[tdx_fields]
+reach_id = "LINKNO"
+downstream_id = "DSLINKNO"
+upstream_id_1 = "USLINKNO1"
+upstream_id_2 = "USLINKNO2"
+
+basin_reach_id = "streamID"
+
+upstream_area = "USContArea"
+downstream_area = "DSContArea"
+stream_order = "strmOrder"
+slope = "Slope"
+
+
+# ============================================================
+# OUTPUT
+# ============================================================
+
+[output]
+output_directory = "/work/comphyd_lab/users/arman.haddadchi/unified_delineation_code/outputs"
+
+write_shapefiles = true
+write_geopackage = true
+write_diagnostics = true
+write_figures = true
+
+# Required NAWM-CWARHM datasets
+catchment_subdirectory = "shapefiles/catchment"
+river_basins_subdirectory = "shapefiles/river_basins"
+river_network_subdirectory = "shapefiles/river_network"
+
+# Diagnostic output
+diagnostics_subdirectory = "diagnostics"
+figures_subdirectory = "figures"
+
+
+# ============================================================
+# VALIDATION
+# ============================================================
+
+[validation]
+check_river_connectivity = true
+check_hru_river_mapping = true
+check_single_outlet = true
+check_polygon_overlap = true
+check_catchment_coverage = true
+
+
+# ============================================================
+# OVERLAY COMPARISON
+# ============================================================
+
+[overlay]
+overlay_check = true
+
+# Existing delineation to compare against
+overlay_shapefile_directory = "/work/comphyd_lab/users/arman.haddadchi/SagehenCk/data/CWARHM"
+
+# Optional explicit reference shapefile.
+# If empty, comparison code will need to discover or be
+# configured with the appropriate reference polygon.
+overlay_shapefile = ""
+
+# Generate comparison statistics and map
+calculate_area_difference = true
+calculate_spatial_overlap = true
+generate_comparison_map = true
