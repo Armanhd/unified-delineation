@@ -7,7 +7,7 @@ The currently implemented and batch-tested workflow uses **TDX-Hydro** river net
 > [!WARNING]
 > **Research code — use with caution. Every delineated basin requires a careful hydrological audit before use.**
 >
-> This workflow produces **candidate watershed delineations**, which may contain errors arising from gauge coordinates, river snapping, source hydrofabric limitations, network connectivity, or outlet and nested-basin processing. **Do not assume that an automatically generated basin is hydrologically correct.**
+> This workflow produces **candidate watershed delineations**, which may contain errors arising from gauge coordinates, river snapping, source hydrofabric limitations, network connectivity, or outlet and nested-basin processing. **Do not assume that an automatically generated basin is hydrologically correct.** We highlight that the script does not account for water diversions or water bodies interventions that might affect the river network.
 >
 > A completed Slurm job, successful GIS export, or structural validation pass **does not establish hydrological correctness or approval for modelling**. Before using any basin in CWARHM, SUMMA, or another analysis, users must:
 >
