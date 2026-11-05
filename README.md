@@ -4,7 +4,20 @@
 
 The currently implemented and batch-tested workflow uses **TDX-Hydro** river networks and catchment polygons. It supports one gauge or a catalogue of gauges, including candidate gauge-to-river snapping, upstream-network tracing, nested/shared-reach analysis, per-basin CWARHM-style GIS exports, structural validation, and a combined ArcGIS review dataset.
 
-> **Research / QA status:** Outputs are preliminary. A completed Slurm job, successful GIS export, or structural validation pass does **not** establish that a gauge location or watershed is hydrologically correct or approved for CWARHM/SUMMA production. Review status and any uncertainties must be preserved.
+> [!WARNING]
+> **Research code — use with caution. Every delineated basin requires a careful hydrological audit before use.**
+>
+> This workflow produces **candidate watershed delineations**, which may contain errors arising from gauge coordinates, river snapping, source hydrofabric limitations, network connectivity, or outlet and nested-basin processing. **Do not assume that an automatically generated basin is hydrologically correct.**
+>
+> A completed Slurm job, successful GIS export, or structural validation pass **does not establish hydrological correctness or approval for modelling**. Before using any basin in CWARHM, SUMMA, or another analysis, users must:
+>
+> - **Inspect the original gauge and selected outlet** against mapped rivers and available station information.
+> - **Compare the total delineated basin area with an independent reference drainage area**, where available, and investigate discrepancies.
+> - **Review the watershed boundary and upstream river network**, checking for missing tributaries, disconnected reaches, and incorrectly included or excluded areas.
+> - **Check nested/shared-reach results**, where applicable, for consistent boundaries, connectivity, and HRU partitions.
+> - **Review all diagnostics and validation reports**, investigate flagged issues, and document unresolved uncertainties.
+>
+> **Users are responsible for assessing whether each delineation is suitable for its intended application.** Preserve processing provenance, audit findings, and review status. Outputs remain preliminary until this review is completed and documented.
 
 ## What the workflow does
 
